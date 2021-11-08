@@ -337,7 +337,7 @@ impl PrimeData {
     pub fn try_count_primes_in_range(&self, range: RangeInclusive<u64>) -> PrimeResult<u64> {
         if let Err(missing_range) = self.range.contains_range(&range) {
             let error = PrimeError {
-                context: ErrorContext { action: ErrorAction::Modifying, source: ErrorSource::PrimeData },
+                context: ErrorContext { action: ErrorAction::Reading, source: ErrorSource::PrimeData },
                 error: ErrorType::NotEnoughData(missing_range)
             };
 
@@ -480,6 +480,86 @@ impl PrimeData {
         let (start, end) = self.range();
         start > end // || self.data.len() == 0
     }
+
+    /// Tries to find the nth prime using the given data
+    /// 
+    /// This will return [`crate::error::ErrorType::NotEnoughData`] error in two situations:
+    /// 
+    /// * The data starts anywhere after 7: This function requires that we count all primes up to
+    /// some bound, so we need the range to start at the beginning. Anywhere `<= 7` suffices.
+    /// * The data doesn't have n primes: Naturally, if we want the 1000th prime, we can't retrieve
+    /// it if the data only has 999.
+    /// 
+    /// This will return [`crate::error::ErrorType::OutOfBounds`] if `nth` is zero.
+    /// 
+    /// See [`Self::nth_prime`]
+    pub fn try_nth_prime(&self, nth: u64) -> PrimeResult<u64> {
+
+        match nth {
+            0 => {
+                let error = PrimeError {
+                    context: ErrorContext { action: ErrorAction::Reading, source: ErrorSource::PrimeData },
+                    error: ErrorType::OutOfBounds(nth)
+                };
+    
+                return Err(error)
+            },
+            1 => return Ok(2),
+            2 => return Ok(3),
+            3 => return Ok(5),
+            _ => {}
+        }
+
+        let total_primes = self.count_primes();
+
+        if let Err(missing_range) = self.range.contains_range(&(7..=total_primes)) {
+
+            let error = PrimeError {
+                context: ErrorContext { action: ErrorAction::Reading, source: ErrorSource::PrimeData },
+                error: ErrorType::NotEnoughData(missing_range)
+            };
+
+            return Err(error)
+        }
+
+        let (unchecked_start, unchecked_end) = super::estimate::nth_prime_bounds(nth).into_inner();
+        let start = std::cmp::max(7, unchecked_start);
+        let end = std::cmp::min(*(self.range.end()), unchecked_end);
+
+        let offset = 3 + self.count_primes_in_range(7..=start) - (if self.is_prime(start) { 1 } else { 0 });
+
+        Ok(self.iter(start..=end).nth((nth - offset - 1) as usize).unwrap())
+    }
+
+    /// Retrieves the nth prime number from some data
+    /// 
+    /// If we call "nth prime number" as p(n), we have that p(1) = 2, because 2 is the first prime
+    /// number. p(2) = 3, and so on. Therefore, the "zeroth" prime number is not defined.
+    /// 
+    /// For an alternative that returns an error instead of panicking, see [`Self::try_nth_prime`]
+    /// 
+    /// # Panics
+    /// 
+    /// Panics in the following situations:
+    /// 
+    /// * `nth` is zero
+    /// * PrimeData (self) starts after 7
+    /// * PrimeData (self) ends before `nth`
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use prime_data::PrimeData;
+    /// let data = PrimeData::generate(7..=105_000);
+    /// 
+    /// assert_eq!(data.nth_prime(1), 2);
+    /// assert_eq!(data.nth_prime(4), 7);
+    /// assert_eq!(data.nth_prime(19), 67);
+    /// assert_eq!(data.nth_prime(10001), 104743);
+    /// ```
+    pub fn nth_prime(&self, nth: u64) -> u64 {
+        self.try_nth_prime(nth).unwrap()
+    }
 }
 
 // private methods
@@ -561,10 +641,6 @@ impl PrimeData {
             None
         }
     }
-
-    fn raw_data<'a>(&'a self) -> &'a [PrimeByte] {
-        &self.data
-    }
 }
 
 use std::fmt;
@@ -624,32 +700,4 @@ impl fmt::Debug for PrimeData {
     }
 
 #[cfg(test)]
-mod tests {
-    use super::PrimeData;
-
-    #[test]
-    fn gen_billion() {
-        let size: u64 = 1u64 << 32;
-        let data = PrimeData::generate(0..=size);
-        // let data1 = PrimeData::generate(0..=size);
-        // let data2 = PrimeData::generate(size..=(2*size));
-        println!("{:?}", analyze_bits(&data));
-        println!("{}", data.count_primes());
-
-        assert_eq!(data.range(), (1, size));
-    }
-
-    fn analyze_bits(data: &PrimeData) -> Vec<(usize, u64)> {
-
-        let mut bit_count = [0u64; 256];
-
-        for byte in data.raw_data().iter() {
-            bit_count[byte.as_u8() as usize] += 1;
-        }
-
-        let mut vec: Vec<(usize, u64)> = bit_count.into_iter().enumerate().collect();
-        vec.sort_by(|a, b| a.1.cmp(&b.1).reverse());
-
-        vec
-    }
-}
+mod tests {}

@@ -10,6 +10,8 @@ mod iterators;
 pub use error::{PrimeResult, PrimeError};
 pub mod error;
 
+pub mod estimate;
+
 mod utils;
 
 /// A list of all values `N % 30`, where N is coprime with 2, 3, and 5

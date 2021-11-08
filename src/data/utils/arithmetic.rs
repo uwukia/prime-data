@@ -1,6 +1,20 @@
 pub trait Number: Copy + Sized + Ord {}
 impl Number for u64 {}
 
+pub trait Logarithm: Number {
+    fn log2(self) -> Self;
+    fn log10(self) -> Self;
+}
+impl Logarithm for u64 {
+    fn log2(self) -> u64 {
+        (self as f64).log2() as u64
+    }
+
+    fn log10(self) -> u64 {
+        (self as f64).log10() as u64
+    }
+}
+
 pub trait Divisible: Number {
     fn div_floor(self, other: Self) -> Self;
     fn div_ceil(self, other: Self) -> Self;
