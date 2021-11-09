@@ -5,6 +5,12 @@ authors = "Kia Strawberries"
 edition = "2021"
 description = "Prime Number Data Library"
 readme = "README.md"
+repository = "https://github.com/uwukia/prime-data"
+license = "MIT OR Apache-2.0"
+keywords = ["primes", "primality", "primal"]
+cathegory = ["mathematics", "data-structures"]
+
+[workspace]
 
 [dependencies]
 
