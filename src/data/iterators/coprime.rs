@@ -3,7 +3,7 @@ use crate::{K_VALUES, data::utils};
 
 /// Struct that iterates over numbers that are coprime with 2, 3, and 5 (a.k.a 30)
 /// 
-/// Click [here](crate::guide::data_iteration) to learn more
+/// To learn more, read the [guide](crate::guide::iterators::_1_coprime).
 /// 
 /// # Examples
 /// 

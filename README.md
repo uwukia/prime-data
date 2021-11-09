@@ -1,37 +1,20 @@
-#![deny(missing_docs)]
-/*!
 # Prime Data
 
-Welcome! This module is a personal project of mine to generate and store prime numbers in a way that's
-both memory efficient and time efficient.
+This library was originally meant to be a simple way of working with prime numbers
+and storing prime numbers in a fast and memory-efficient way.
 
-## What's this?
-
-This crate has a user guide, which is quite recommended if you want to learn more about keeping the
-efficiency of the Sieve of Eratosthenes, but increasing the memory efficiency of storing and generating
-primes. Click [here](crate::guide) if you wish to read it.
-
-However, if you just want to know how to utilize this crate, read below:
-
-# TL;DR / How to use this library
 
 When you import this crate into your project, you will have, by default, access to the following tools:
 
 Let's say you want to know what are all the prime numbers between 100 and 200:
 
-```
+```rust
 let primes = prime_data::PrimeData::generate(100..=200)
 ```
 
-You can easily generate that data with the [generate](crate::PrimeData::generate) method. By design,
-every method or function that requires some range will be an [inclusive range](std::ops::RangeInclusive).
-This is just because of a few conventions involving prime numbers. For example, in mathematics, when we
-want to count "the amount of prime numbers from 1 to x", we usually want to include x, if it is prime.
-
 With that, you can do some cool things with it:
 
-```
-# let primes = prime_data::PrimeData::generate(100..=200)
+```rust
 // You can iterate over all those prime numbers
 for prime in primes.iter_all() {
     println!("{} is a prime number!", prime);
@@ -55,7 +38,7 @@ println!("There are {} primes between 161 and 179.", primes.count_primes_in_rang
 
 However, there are some handy public methods, that abstract you from the need of generating any data:
 
-```
+```rust
 // You can verify if a number is prime
 println!("2027 is {}", if prime_data::is_prime(2_027) { "prime!" } else { "not prime!" });
 
@@ -71,7 +54,7 @@ You'll get more functionality by including features in the dependency:
 
 The **factors** feature includes a struct and a public method for factorizing numbers.
 
-```
+```rust
 # #[cfg(feature = "factors")] {
 // from some prime data...
 let data = prime_data::PrimeData::generate(0..=12);
@@ -97,10 +80,3 @@ println!("The factors of 44 are {:?}", factorized_44);
 // finally, if you only need to list a number's factors once:
 println!("The factors of 490 are {:?}", prime_data::all_factors_of(490));
 # }
-
-*/
-
-pub use data::*;
-mod data;
-
-pub mod guide;

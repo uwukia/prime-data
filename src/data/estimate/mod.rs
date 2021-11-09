@@ -1,7 +1,6 @@
 //! # Prime Estimates
 //! 
 //! This module is dedicated for estimating prime bounds
-#![allow(missing_docs)]
 
 use super::PrimeData;
 

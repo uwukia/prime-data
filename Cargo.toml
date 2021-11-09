@@ -1,11 +1,20 @@
 [package]
 name = "prime-data"
 version = "0.1.0"
+authors = "Kia Strawberries"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Prime Number Data Library"
+readme = "README.md"
 
 [dependencies]
 
 [profile.test]
 opt-level = 3
+
+[features]
+all = ["factors"]
+factors = []
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

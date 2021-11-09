@@ -29,6 +29,9 @@ use super::{PrimeByte, PrimeIter, CoprimeIter, error::*, utils::{IntSqrt, Contai
 /// 
 /// 1. [`PrimeData::generate`]
 /// 
+/// The simplest one. Just give that function a range and it'll return a PrimeData instance with all
+/// primes that lie in the range you gave.
+/// 
 /// 2. [`PrimeData::expand`]
 /// 
 /// If you already have some PrimeData that has all primes until some number N, and you want to gather
@@ -38,7 +41,7 @@ use super::{PrimeByte, PrimeIter, CoprimeIter, error::*, utils::{IntSqrt, Contai
 /// In fact, the [generator](PrimeData::generate) method is just an abstraction over the expand function.
 /// What it does is, it calls the [`PrimeData::new`] method to generate prime numbers below 30, then
 /// expands it into bigger and bigger data until it hits `sqrt(N)`, where N is the upper bound of the
-/// data you're trying to generate.
+/// data you're trying to generate. Finally, it does one last expansin from `sqrt(N)` to `N`.
 pub struct PrimeData {
     pub(crate) data: Vec<PrimeByte>,
     pub(crate) range: RangeInclusive<u64>,
@@ -103,8 +106,8 @@ impl PrimeData {
 
     /// Tries to create an iterator over the given range
     /// 
-    /// Will try to iterate over all primes in the given range, returning an error if the
-    /// given range falls out of the targeted PrimeData range.
+    /// Returns a [NotEnoughData](crate::error::ErrorType::NotEnoughData) error if the given range
+    /// falls out of the data (self) range.
     /// 
     /// See [`PrimeData::iter`].
     pub fn try_iter<'a>(&'a self, range: RangeInclusive<u64>) -> PrimeResult<PrimeIter<'a>> {
@@ -113,14 +116,14 @@ impl PrimeData {
 
     /// Creates an iterator over the given range
     /// 
-    /// Will iterate over all primes in the given range, if you wish to return an error instead of
-    /// panicking, see [`PrimeData::try_iter`].
+    /// Will iterate over all primes in the given range. See [`Self::try_iter`]
+    /// if you wish to return an error instead of panicking.
     /// 
-    /// If you wish to iterate over all primes in the given range, see [`PrimeData::iter_all`].
+    /// If you wish to iterate over all primes within the given range, see [`PrimeData::iter_all`].
     /// 
     /// # Panics
     /// 
-    /// Panics if the given range falls out of the targeted PrimeData range.
+    /// Panics if the given range falls out of the data (self) range.
     /// 
     /// # Examples
     /// 
@@ -155,7 +158,7 @@ impl PrimeData {
     /// **Warning**: PrimeData are meant to be really condensed, so when you extract raw prime vectors
     /// from it, it could grow in size up to 8 times as itself. So collect this iterator carefully!
     /// 
-    /// If you wish to iterate over primes within some range, see [`PrimeData::iter`]
+    /// If you wish to iterate over primes within a specific range, see [`PrimeData::iter`]
     /// 
     /// # Examples
     /// 
@@ -179,8 +182,8 @@ impl PrimeData {
     /// 
     /// The expanded data will contain all primes in `range`
     /// 
-    /// Returns an error if the current PrimeData does not have enough data
-    /// to retrieve primes in the given range.
+    /// Returns a [NotEnoughData](crate::error::ErrorType::NotEnoughData) error if
+    /// the given range falls out of the data (self) range.
     /// 
     /// See [`PrimeData::expand`].
     pub fn try_expand(&self, range: RangeInclusive<u64>) -> PrimeResult<Self> {
@@ -215,16 +218,16 @@ impl PrimeData {
 
     /// Expands the current PrimeData into more PrimeData
     /// 
-    /// The expanded data will contain all primes in `range`
+    /// The expanded data will contain all primes in the given range.
     /// 
-    /// If you wish to return an error instead of panicking, see [`PrimeData::try_expand`]
+    /// See [`PrimeData::try_expand`] if you wish to return an error instead of panicking.
     /// 
     /// # Panics
     ///
     /// Panics if the given PrimeData does not have enough data to expand into the given range.
     /// 
     /// More specifically, if you wish to expand it to some prime data with range (X..=Y), the
-    /// current PrimeData must have a range from 7 to √Y or more.
+    /// PrimeData (self) must have a range from 7 to √Y or more.
     /// 
     /// # Examples
     /// 
@@ -264,7 +267,7 @@ impl PrimeData {
     /// 
     /// PrimeData stores its raw data based on its range. The data starts at ⌊ range.start / 30 ⌋
     /// 
-    /// To know more, read the [guide](crate::guide::data).
+    /// To learn more, read the [guide](crate::guide::data_structure::_2_prime_data)
     /// 
     /// # Examples
     /// 
@@ -281,6 +284,9 @@ impl PrimeData {
     }
 
     /// Tries to verify if the given number is prime
+    /// 
+    /// Returns an [OutOfBounds](crate::error::ErrorType::OutOfBounds) error if
+    /// the data range does not contain x.
     /// 
     /// See [`PrimeData::is_prime`]
     pub fn try_is_prime(&self, x: u64) -> PrimeResult<bool> {
@@ -303,7 +309,12 @@ impl PrimeData {
 
     /// Verifies if the given number is prime
     /// 
-    /// If you want to avoid panicking and error handle, see [`PrimeData::try_is_prime`].
+    /// **Note**: If your data starts below 7, it's heavily recommended to use the
+    /// [`check_primes`](crate::PrimeData::check_prime) method instead. This is because
+    /// this method requires the given parameter to lie within the data range. But the other only
+    /// requires that the data range includes `7..=sqrt(parameter)`.
+    /// 
+    /// See [`PrimeData::try_is_prime`] if you wish to return an error instead of panicking.
     /// 
     /// # Panics
     /// 
@@ -329,9 +340,8 @@ impl PrimeData {
 
     /// Tries to count the amount of prime numbers in a given range
     /// 
-    /// Returns an error if the range goes out of the data's range. Keep in mind that if the range
-    /// start is greater than the range end, Rust interprets that as an empty range, and this function
-    /// will return zero.
+    /// Returns a [NotEnoughData](crate::error::ErrorType::NotEnoughData) error if
+    /// the given range falls out of the data (self) range.
     /// 
     /// See [`PrimeData::count_primes_in_range`].
     pub fn try_count_primes_in_range(&self, range: RangeInclusive<u64>) -> PrimeResult<u64> {
@@ -425,7 +435,7 @@ impl PrimeData {
     /// Keep in mind that if the range start is greater than the range end, Rust interprets that as an
     /// empty range, and this function will return zero. 
     /// 
-    /// If you wish for it to return an error instead of panic, see [`PrimeData::try_count_primes_in_range`].
+    /// See [`PrimeData::try_count_primes_in_range`] if you wish to return an error instead of panicking.
     /// 
     /// # Examples
     /// 
@@ -445,7 +455,7 @@ impl PrimeData {
 
     /// Counts the amount of prime numbers in the entire data
     /// 
-    /// If you wish to only count primes within some range, see [`PrimeData::count_primes_in_range`].
+    /// If you wish to only count primes within a specific range, see [`PrimeData::count_primes_in_range`].
     /// 
     /// # Examples
     /// 
@@ -465,7 +475,7 @@ impl PrimeData {
 
     /// Verifies if the data is empty.
     /// 
-    /// This will guaranteed to happen if the range start is greated than range end.
+    /// Returns `true` if and only if the the range end is greater than the range start.
     /// 
     /// # Examples
     /// 
@@ -483,14 +493,14 @@ impl PrimeData {
 
     /// Tries to find the nth prime using the given data
     /// 
-    /// This will return [`crate::error::ErrorType::NotEnoughData`] error in two situations:
+    /// Returns a [NotEnoughData](crate::error::ErrorType::NotEnoughData) error in two situations:
     /// 
     /// * The data starts anywhere after 7: This function requires that we count all primes up to
     /// some bound, so we need the range to start at the beginning. Anywhere `<= 7` suffices.
     /// * The data doesn't have n primes: Naturally, if we want the 1000th prime, we can't retrieve
     /// it if the data only has 999.
     /// 
-    /// This will return [`crate::error::ErrorType::OutOfBounds`] if `nth` is zero.
+    /// Returns an [OutOfBounds](crate::error::ErrorType::OutOfBounds) error if `nth` is zero.
     /// 
     /// See [`Self::nth_prime`]
     pub fn try_nth_prime(&self, nth: u64) -> PrimeResult<u64> {
@@ -536,7 +546,7 @@ impl PrimeData {
     /// If we call "nth prime number" as p(n), we have that p(1) = 2, because 2 is the first prime
     /// number. p(2) = 3, and so on. Therefore, the "zeroth" prime number is not defined.
     /// 
-    /// For an alternative that returns an error instead of panicking, see [`Self::try_nth_prime`]
+    /// See [`Self::try_nth_prime`] if you wish to return an error instead of panicking.
     /// 
     /// # Panics
     /// 
@@ -559,6 +569,128 @@ impl PrimeData {
     /// ```
     pub fn nth_prime(&self, nth: u64) -> u64 {
         self.try_nth_prime(nth).unwrap()
+    }
+
+    /// Tries to verify if the given number is prime
+    /// 
+    /// Returns a [NotEnoughData](crate::error::ErrorType::NotEnoughData) error if both are true:
+    /// 
+    /// * The data range does not include x
+    /// * The data range does not contain the range between 7 and √x
+    /// 
+    /// See [`Self::check_prime`]
+    pub fn try_check_prime(&self, x: u64) -> PrimeResult<bool> {
+        if self.range.contains(&x) {
+            self.try_is_prime(x)
+        } else {
+
+            let sqrt = x.sqrt_floor();
+
+            if let Err(missing_range) = self.range.contains_range(&(7..=sqrt)) {
+
+                let error = PrimeError {
+                    context: ErrorContext { action: ErrorAction::Reading, source: ErrorSource::PrimeData },
+                    error: ErrorType::NotEnoughData(missing_range)
+                };
+    
+                return Err(error)
+            }
+
+            if (x == 2) || (x == 3) || (x == 5) { return Ok(true) }
+            if x.divisible_by(30) { return Ok(false) }
+
+            for prime in self.iter(7..=sqrt) {
+                if x.divisible_by(prime) { return Ok(false) }
+            }
+
+            Ok(true)
+        }
+    }
+
+    /// Verifies if the given number is prime
+    /// 
+    /// If we have information of all prime numbers between 0 and √x, we can verify if x is prime
+    /// by checking if none of those primes divide x. Therefore, when calling this function, if x
+    /// lies inside the data, it's O(1), but if the data has information about all primes up to √x,
+    /// it's O(n).
+    /// 
+    /// See [`Self::try_check_prime`] if you wish to return an error instead of panicking.
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if both are true:
+    /// 
+    /// * The data range does not include x
+    /// * The data range does not contain the range between 7 and √x
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use prime_data::PrimeData;
+    /// 
+    /// let data = PrimeData::generate(7..=35);
+    /// 
+    /// assert!( data.check_prime(7));  // O(1)
+    /// assert!(!data.check_prime(35)); // O(1)
+    /// assert!( data.check_prime(1123));  // O(n)
+    /// assert!(!data.check_prime(1225));  // O(n)
+    /// ```
+    pub fn check_prime(&self, x: u64) -> bool {
+        self.try_check_prime(x).unwrap()
+    }
+
+    /// Tries to factorize the given number into prime factors.
+    /// 
+    /// Returns a [NotEnoughData](crate::error::ErrorType::NotEnoughData) error if
+    /// the data (self) range does not contain the range `2..=sqrt(x)`.
+    /// 
+    /// See [`Self::factorize`]
+    #[cfg(feature = "factors")]
+    pub fn try_factorize(&self, x: u64) -> PrimeResult<super::Factorization> {
+
+        let mut number = x;
+        let sqrt = x.sqrt_floor();
+
+        if let Err(missing_range) = self.range.contains_range(&(2..=sqrt)) {
+            let error = PrimeError {
+                context: ErrorContext { action: ErrorAction::Reading, source: ErrorSource::PrimeData },
+                error: ErrorType::NotEnoughData(missing_range)
+            };
+
+            return Err(error)
+        }
+
+        let mut factorization = super::Factorization::new();
+
+        for prime in self.iter(2..=sqrt) {
+            while number % prime == 0 {
+                factorization.add_factor(prime);
+                number /= prime;
+            }
+        }
+
+        if factorization.is_empty() && number > 1 {
+            factorization.add_factor(number);
+        }
+
+        Ok(factorization)
+    }
+
+    /// Factorizes the given number into prime factors.
+    /// 
+    /// See [`Self::try_factorize`] if you wish to return an error instead of panicking.
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if the data (self) range does not contain the range `2..=sqrt(x)`.
+    /// 
+    /// # Examples
+    /// 
+    /// This function returns a [Factorization](super::Factorization) struct. Read
+    /// to the struct's documentation for its methods and examples.
+    #[cfg(feature = "factors")]
+    pub fn factorize(&self, x: u64) -> super::Factorization {
+        self.try_factorize(x).unwrap()
     }
 }
 

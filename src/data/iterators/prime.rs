@@ -1,9 +1,12 @@
 use std::ops::RangeInclusive;
 use crate::{PrimeData, PrimeByte, data::{error::*, utils::{Divisible, ContainsRange}}};
 
-/// Struct that iterates over prime numbers from some data
+/// Struct that iterates over prime numbers from some data.
 /// 
-/// Click [here](crate::guide::data_iteration) to learn more
+/// To learn more, read the [guide](crate::guide::iterators::_2_prime).
+/// 
+/// Iterator takes a reference to [PrimeData](crate::PrimeData), therefore, it cannot
+/// outlive the given data.
 /// 
 /// # Examples
 /// 
@@ -33,8 +36,8 @@ pub struct PrimeIter<'a> {
 impl<'a> PrimeIter<'a> {
     /// Creates an iterator over some [PrimeData](crate::PrimeData) within a given range.
     /// 
-    /// Returns a [NotEnoughData](crate::data::PrimeError) error if the given range is not
-    /// contained in the PrimeData's range.
+    /// Returns a [NotEnoughData](crate::error::ErrorType::NotEnoughData) error if the given range
+    /// is not contained in the PrimeData's range.
     pub fn new(prime_data: &'a PrimeData, range: RangeInclusive<u64>) -> PrimeResult<Self> {
         if let Err(out_of_bounds) = prime_data.range.contains_range(&range) {
 

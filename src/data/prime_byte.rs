@@ -6,7 +6,7 @@ use super::K_VALUES;
 /// A "byte of primes", a chunk of 8 bits corresponding to the 8 values in the (0..30) range
 /// that are not divisible by 2, 3, or 5. Those values are also called **k-values**.
 /// 
-/// Click [here](crate::guide::prime_byte) to learn more
+/// To learn more, read the [guide](crate::guide::data_structure::_1_prime_byte).
 /// 
 /// "k-values" are values k, such that (N % 30 = k) and N is coprime with 30. Those values
 /// are listed [here](crate::data::K_VALUES).
@@ -31,9 +31,10 @@ impl PrimeByte {
 
     /// Sets one of the bits to non-prime/composite based on the k-value
     ///
-    /// If the given value is not a k-value, returns an error.
-    /// If the bit was already set to non-prime, returns false.
-    /// Otherwise, returns true.
+    /// If the bit was already set to non-prime, returns false. Otherwise, returns true.
+    /// 
+    /// Returns an [OutOfBounds](crate::error::ErrorType::OutOfBounds) error if
+    /// the given value is not a k-value, returns an error.
     /// 
     /// To understand what k-value maps to what bit, refer to the [k-values](crate::data::K_VALUES)
     /// 
@@ -93,10 +94,10 @@ impl PrimeByte {
 
     /// Retrieves all bits set to one and converts them into their respective k-values
     /// 
-    /// For more information, read the [guide](crate::guide::prime_byte), or refer to the
+    /// For more information, read the [guide](crate::guide::data_structure::_1_prime_byte), or refer to the
     /// list of [k-values](crate::data::K_VALUES). 
     /// 
-    /// If you wish to retrieve k-values within some range, see [`PrimeByte::as_k_values_in_range`].
+    /// If you wish to retrieve k-values within a specific range, see [`PrimeByte::as_k_values_in_range`].
     ///
     /// # Examples
     /// 
@@ -119,7 +120,7 @@ impl PrimeByte {
     /// Retrieves all bits set to one and converts them into their respective k-values,
     /// as long as they fall inside the inclusive range
     /// 
-    /// For more information, read the [guide](crate::guide::prime_byte), or refer to the
+    /// For more information, read the [guide](crate::guide::data_structure::_1_prime_byte), or refer to the
     /// list of [k-values](crate::data::K_VALUES). 
     /// 
     /// If you wish to retrieve all k-values, see [`PrimeByte::as_k_values`].
@@ -144,10 +145,10 @@ impl PrimeByte {
 
     /// Retrieves the k-values and converts them to actual prime numbers.
     ///
-    /// For more information, read the [guide](crate::guide::prime_byte).
+    /// For more information, read the [guide](crate::guide::data_structure::_1_prime_byte).
     ///
     /// Calling this function with `offset = 1` yields the same results as [`PrimeByte::as_k_values`],
-    /// except that it returns a vector of [u64] instead of [u8].
+    /// except that it returns a vector of [`u64`] instead of [`u8`].
     /// 
     /// If you wish to only retrieve primes within a range, see [`PrimeByte::as_primes_in_range`]
     /// 
@@ -171,11 +172,9 @@ impl PrimeByte {
 
     /// Retrieves the k-values, as long as they fall inside the inclusive range,
     /// and converts them to actual prime numbers
-    /// 
-    /// For more information, read the [guide](crate::guide::prime_byte).
     ///
     /// Calling this function with `offset = 1` yields the same results as
-    /// [`PrimeByte::as_k_values_in_range`], except that it returns a vector of [u64] instead of [u8].
+    /// [`PrimeByte::as_k_values_in_range`], except that it returns a vector of [`u64`] instead of [`u8`].
     /// 
     /// If you wish to retrieve all primes, see [`PrimeByte::as_primes`]
     /// 
@@ -265,7 +264,7 @@ impl PrimeByte {
 
     /// Counts the number of primes (a.k.a the number of ones) it has.
     /// 
-    /// If you wish to count primes in some range, see [`PrimeByte::count_primes_in_range`]
+    /// If you wish to count primes in a specific range, see [`PrimeByte::count_primes_in_range`]
     /// 
     /// # Examples
     /// 
@@ -303,9 +302,6 @@ impl PrimeByte {
     /// This has the same effect as calling `u8::from()`. It's meant to be an alternative way
     /// of converting into a u8, having the byte be written on the left instead of right.
     /// 
-    /// Technically, only requires a reference when `u8::from` consumes it, however, PrimeByte
-    /// implements [`Copy`], so there's no difference.
-    /// 
     /// # Examples
     /// 
     /// ```
@@ -322,6 +318,9 @@ impl PrimeByte {
     /// Range is expected to be within (0..=30), but it will not return an error or panic, if given
     /// anything above 30. If you pass it some range like (30..=199), since none of the bits fall in
     /// that range, none will be compared, and hence the function will trivially return true.
+    /// 
+    /// There is no `Self::matches` method (without a range restriction) because that's the same as
+    /// verifying if the two bytes are equal. PrimeByte implements [`Eq`].
     /// 
     /// # Examples
     /// 
@@ -342,7 +341,6 @@ impl PrimeByte {
         .fold(true, |acc, (cur, _)| acc && (cur.0 == cur.1))
     }
 
-    /// Returns whether the last bit of `bit` is a one
     fn is_one(bit: u8) -> bool {
         bit % 2 == 1
     }

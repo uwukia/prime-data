@@ -6,8 +6,8 @@ use crate::data::utils::Logarithm;
 /// where a "good enough" estimate would suffice.
 /// 
 /// This function is guaranteed to give you a value greater or equal to the actual amount of prime numbers
-/// up to the given number. The error is also guaranteed to be `< 0.005`, but it gets better as the given
-/// number goes to infinity.
+/// up to the given number. The relative error is also guaranteed to be `< 0.005`, but it gets better as
+/// the given number goes to infinity.
 pub fn upper_bound(bound: u64) -> u64 {
     if bound <= 10_000 {
         super::exact_count(bound)
