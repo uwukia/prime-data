@@ -20,7 +20,7 @@ When you import this crate into your project, you will have, by default, access 
 Let's say you want to know what are all the prime numbers between 100 and 200:
 
 ```
-let primes = prime_data::PrimeData::generate(100..=200)
+let primes = prime_data::PrimeData::generate(100..=200);
 ```
 
 You can easily generate that data with the [generate](crate::PrimeData::generate) method. By design,
@@ -31,7 +31,7 @@ want to count "the amount of prime numbers from 1 to x", we usually want to incl
 With that, you can do some cool things with it:
 
 ```
-# let primes = prime_data::PrimeData::generate(100..=200)
+# let primes = prime_data::PrimeData::generate(100..=200);
 // You can iterate over all those prime numbers
 for prime in primes.iter_all() {
     println!("{} is a prime number!", prime);
@@ -92,7 +92,7 @@ println!("120 has {} factors in total.", all_factors.len());
 
 // you can also convert a u64 into its factorization
 let factorized_44 = prime_data::Factorization::from(44);
-println!("The factors of 44 are {:?}", factorized_44);
+println!("The factors of 44 are {:?}", factorized_44.all_factors());
 
 // finally, if you only need to list a number's factors once:
 println!("The factors of 490 are {:?}", prime_data::all_factors_of(490));

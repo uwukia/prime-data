@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/uwukia/prime-data"
 license = "MIT OR Apache-2.0"
 keywords = ["primes", "primality", "primal"]
-category = ["mathematics", "data-structures"]
+categories = ["mathematics", "data-structures"]
 exclude = ["src/guide/conventions.md"]
 
 [workspace]

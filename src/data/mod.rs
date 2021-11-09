@@ -68,9 +68,7 @@ mod public_methods {
     /// assert_eq!(count_primes(1_000),   168);
     /// assert_eq!(count_primes(100_000), 9592);
     /// ```
-    pub fn count_primes(x: u64) -> bool {
-        let sqrt = x.sqrt_floor();
-
-        super::PrimeData::generate(0..=sqrt).check_prime(x)
+    pub fn count_primes(x: u64) -> u64 {
+        super::PrimeData::generate(0..=x).count_primes()
     }
 }

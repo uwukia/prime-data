@@ -3,13 +3,12 @@
 This library was originally meant to be a simple way of working with prime numbers
 and storing prime numbers in a fast and memory-efficient way.
 
-
 When you import this crate into your project, you will have, by default, access to the following tools:
 
 Let's say you want to know what are all the prime numbers between 100 and 200:
 
 ```rust
-let primes = prime_data::PrimeData::generate(100..=200)
+let primes = prime_data::PrimeData::generate(100..=200);
 ```
 
 With that, you can do some cool things with it:

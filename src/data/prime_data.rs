@@ -664,12 +664,13 @@ impl PrimeData {
 
         for prime in self.iter(2..=sqrt) {
             while number % prime == 0 {
+                let other_factor = number / prime;
                 factorization.add_factor(prime);
                 number /= prime;
             }
         }
 
-        if factorization.is_empty() && number > 1 {
+        if number > 1 {
             factorization.add_factor(number);
         }
 

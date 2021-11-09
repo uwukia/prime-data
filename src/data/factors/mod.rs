@@ -96,7 +96,6 @@ impl Factorization {
     /// ```
     pub fn all_factors(&self) -> Vec<u64> {
         let tuples = self.as_tuples();
-
         let mut vector = Self::factor_combos(&tuples);
         vector.sort();
 
@@ -147,3 +146,4 @@ impl From<u64> for Factorization {
         prime_data.factorize(number)
     }
 }
+
