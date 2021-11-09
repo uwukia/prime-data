@@ -1,6 +1,6 @@
 [package]
 name = "prime-data"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Kia Strawberries"]
 edition = "2021"
 description = "Prime Number Data Library"
