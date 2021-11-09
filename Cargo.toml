@@ -9,6 +9,7 @@ repository = "https://github.com/uwukia/prime-data"
 license = "MIT OR Apache-2.0"
 keywords = ["primes", "primality", "primal"]
 cathegory = ["mathematics", "data-structures"]
+exclude = ["src/guide/conventions.md"]
 
 [workspace]
 
