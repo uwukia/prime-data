@@ -54,7 +54,6 @@ You'll get more functionality by including features in the dependency:
 The **factors** feature includes a struct and a public method for factorizing numbers.
 
 ```rust
-# #[cfg(feature = "factors")] {
 // from some prime data...
 let data = prime_data::PrimeData::generate(0..=12);
 
@@ -74,8 +73,9 @@ println!("120 has {} factors in total.", all_factors.len());
 
 // you can also convert a u64 into its factorization
 let factorized_44 = prime_data::Factorization::from(44);
-println!("The factors of 44 are {:?}", factorized_44);
+println!("The factors of 44 are {:?}", factorized_44.all_factors());
 
-// finally, if you only need to list a number's factors once:
+// finally, if you only need to list a number's factors once,
+// you can use the public method:
 println!("The factors of 490 are {:?}", prime_data::all_factors_of(490));
-# }
+```
