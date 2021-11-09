@@ -24,7 +24,6 @@ use std::collections::HashMap;
 /// assert_eq!(all_factors_of(3), vec![1, 3]);
 /// assert_eq!(all_factors_of(6), vec![1, 2, 3, 6]);
 /// ```
-#[cfg_attr(docsrs, doc(cfg(feature = "factors")))]
 pub fn all_factors_of(x: u64) -> Vec<u64> {
     Factorization::from(x).all_factors()
 }
@@ -32,7 +31,6 @@ pub fn all_factors_of(x: u64) -> Vec<u64> {
 /// Represents some number into its prime-factorized form
 /// 
 /// *This struct is only available with the `factors` feature enabled.*
-#[cfg_attr(docsrs, doc(cfg(feature = "factors")))]
 pub struct Factorization {
     data: HashMap<u64, u32>
 }
